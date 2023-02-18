@@ -227,16 +227,28 @@ void readPmem () {
 }
 
 int main () {
-    Node* head = new Node (-1, "head");
-    persist (pmem_simulation, head, nullptr);
-    pmem_simulation.open (pmem_name);
-    pmem_simulation.clear ();
-    createLinkedlistWithoutBarrier (head, true);
-    pmem_simulation.close ();
+    // If you want to write the data to file, please comment the recovery part
+    // If you want to recover the data from file, please comment the write data part
 
+    // ============================================
+    // This code block for writing the data to the file
+    // Node* head = new Node (-1, "head");
+    // persist (pmem_simulation, head, nullptr);
+    // pmem_simulation.open (pmem_name);
+    // pmem_simulation.clear ();
+
+    // // manually reverse the linking order.
+    // createLinkedlistWithoutBarrier (head, false);
+    // // Do not reverse the linking order
+    // // createLinkedlistWithBarrier (head, true);
+    // pmem_simulation.close ();
+    // ============================================
+
+    // ============================================
     // Use for recovery
     readPmem ();
     Node* rhead = recoverFromPmem ();
     printMyAccount (rhead);
+    // ============================================
     return 1;
 }
