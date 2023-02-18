@@ -151,104 +151,23 @@ void createLinkedlistWithoutBarrier (Node* head, int isCrash) {
     persist (pmem_simulation, C, B);
 }
 
-Node* recoverFromPmem () {
-    Node* head = new Node (-1, "head");
-    recovered_node[head->name] = head;
-    for (auto& vec : read_from_pmem) {
-        std::string key, value;
-        int kval, vval;
-        key = vec[0];
-        kval = std::stoi (vec[1]);
-        value = vec[2];
-        if (vec[3] == "NULL") {
-            vval = 0;
-        } else {
-            vval = std::stoi (vec[3]);
-        }
-
-        Node* keyNode = nullptr;
-        Node* valNode = nullptr;
-        if (recovered_node.count (key) == 0) {
-            // not recovered, ready to recover
-            keyNode = new Node (kval, key);
-            recovered_node[key] = keyNode;
-        } else {
-            // already recovered
-            keyNode = recovered_node[key];
-        }
-        if (value != "NULL") {
-            if (recovered_node.count (value) == 0) {
-                // not recovered, ready to recover
-                valNode = new Node (vval, value);
-                recovered_node[value] = valNode;
-            } else {
-                // already recovered
-                valNode = recovered_node[value];
-            }
-        }
-        keyNode->next = valNode;
-    }
-    return head;
-}
-
-void readPmem () {
-    std::string line;
-    std::ifstream rpmem (pmem_name);
-    if (rpmem.is_open ()) {
-        while (getline (rpmem, line)) {
-            std::string delimiter = " ";
-            size_t last = 0;
-            size_t next = 0;
-            std::string key, kval, value, vval;
-            next = line.find (delimiter, last);
-            key = line.substr (last, next - last);
-
-            last = next + 1;
-            next = line.find (delimiter, last);
-            kval = line.substr (last, next - last);
-
-            last = next + 1;
-            next = line.find (delimiter, last);
-            value = line.substr (last, next - last);
-
-            last = next + 1;
-            next = line.find (delimiter, last);
-            vval = line.substr (last, next - last);
-
-            // std::cout << "[READ]" << key << " " << kval << " " << value << " " << vval;
-
-            read_from_pmem.push_back ({key, kval, value, vval});
-        }
-        rpmem.close ();
-        std::cout << "======== Read from Pmem ========" << std::endl;
-    } else {
-        std::cout << "Unable to open pmem\n";
-    }
-}
-
 int main () {
     // If you want to write the data to file, please comment the recovery part
     // If you want to recover the data from file, please comment the write data part
 
     // ============================================
     // This code block for writing the data to the file
-    // Node* head = new Node (-1, "head");
-    // persist (pmem_simulation, head, nullptr);
-    // pmem_simulation.open (pmem_name);
-    // pmem_simulation.clear ();
+    Node* head = new Node (-1, "head");
+    persist (pmem_simulation, head, nullptr);
+    pmem_simulation.open (pmem_name);
+    pmem_simulation.clear ();
 
-    // // manually reverse the linking order.
-    // createLinkedlistWithoutBarrier (head, false);
-    // // Do not reverse the linking order
-    // // createLinkedlistWithBarrier (head, true);
-    // pmem_simulation.close ();
-    // ============================================
+    // manually reverse the linking order.
+    createLinkedlistWithoutBarrier (head, false);
 
-    // ============================================
-    // Use for recovery
-    readPmem ();
-    Node* rhead = recoverFromPmem ();
-    printMyAccount (rhead);
+    // Do not reverse the linking order
+    // createLinkedlistWithBarrier (head, true);
+    pmem_simulation.close ();
     // ============================================
     return 1;
 }
