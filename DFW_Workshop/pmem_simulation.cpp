@@ -151,6 +151,31 @@ void createLinkedlistWithoutBarrier (Node* head, int isCrash) {
     persist (pmem_simulation, C, B);
 }
 
+void insertLinkedlist (Node* head, int isCrash) {
+    // initially linked list
+    createLinkedlistWithBarrier (head, false);
+
+    Node* cur = head;
+    // insert a node to the linked list
+    while (cur) {
+        if (cur->next->name == "B") {
+            // 1. create a node & persist
+            Node* n1 = new Node (99999, "new_insert");
+            persist (pmem_simulation, n1, nullptr);
+
+            // TODO: 2. link new node to next of cur & persist
+            //
+            persist (pmem_simulation, n1, cur->next);
+
+            // TODO: 3. link cur to n1 & persist
+            if (isCrash) return;
+            persist (pmem_simulation, cur, n1);
+            break;
+        }
+        cur = cur->next;
+    }
+}
+
 int main () {
     // If you want to write the data to file, please comment the recovery part
     // If you want to recover the data from file, please comment the write data part
@@ -162,11 +187,15 @@ int main () {
     pmem_simulation.open (pmem_name);
     pmem_simulation.clear ();
 
-    // manually reverse the linking order.
-    createLinkedlistWithoutBarrier (head, false);
+    // exp 1. Manually reverse the linking order.
+    createLinkedlistWithoutBarrier (head, true);
 
-    // Do not reverse the linking order
+    // exp 2. Do not reverse the linking order
     // createLinkedlistWithBarrier (head, true);
+
+    // exp 3. Insertion
+    // insertLinkedlist (head, false);
+
     pmem_simulation.close ();
     // ============================================
     return 1;
