@@ -2,7 +2,7 @@
 
 This experiment mainly focused on discovering what may happen when system crashes happen during creating the linked list.
 
-In this experiment, we eimulate the process of writing the data to the persistent memory, and mannual control the position of system crash happen during the code execution.
+In this experiment, we emulate the process of writing the data to the persistent memory, and mannual control the position of system crash happen during the code execution.
 
 The experiment also includes the implementation of queue using libpmemobj C++ API. It runs in persistent memory.
 
