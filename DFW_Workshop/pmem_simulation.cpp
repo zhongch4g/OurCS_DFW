@@ -164,10 +164,15 @@ void insertLinkedlist (Node* head, int isCrash) {
             persist (pmem_simulation, n1, nullptr);
 
             // TODO: 2. link new node to next of cur & persist
-            //
+            // ====== Write your code here ======
+
+            // ==================================
             persist (pmem_simulation, n1, cur->next);
 
             // TODO: 3. link cur to n1 & persist
+            // ====== Write your code here ======
+
+            // ==================================
             if (isCrash) return;
             persist (pmem_simulation, cur, n1);
             break;
@@ -176,9 +181,18 @@ void insertLinkedlist (Node* head, int isCrash) {
     }
 }
 
-int main () {
-    // If you want to write the data to file, please comment the recovery part
-    // If you want to recover the data from file, please comment the write data part
+int main (int argc, char* argv[]) {
+    if (argc < 3) {
+        std::cerr << "usage: " << argv[0] << "[1|2|3] [0|1]" << std::endl;
+        std::cerr << "first arg [1|2|3]" << std::endl;
+        std::cerr << "1:createLinkedlistWithoutBarrier" << std::endl;
+        std::cerr << "2:createLinkedlistWithBarrier" << std::endl;
+        std::cerr << "3:insertLinkedlist" << std::endl;
+        std::cerr << "second [1|2]" << std::endl;
+        std::cerr << "0:make it not crash" << std::endl;
+        std::cerr << "1:make it crash" << std::endl;
+        return 1;
+    }
 
     // ============================================
     // This code block for writing the data to the file
@@ -187,14 +201,20 @@ int main () {
     pmem_simulation.open (pmem_name);
     pmem_simulation.clear ();
 
-    // exp 1. Manually reverse the linking order.
-    createLinkedlistWithoutBarrier (head, true);
-
-    // exp 2. Do not reverse the linking order
-    // createLinkedlistWithBarrier (head, true);
-
-    // exp 3. Insertion
-    // insertLinkedlist (head, false);
+    int func = std::stoull (argv[1]);
+    int isCrash = std::stoull (argv[2]);
+    if (func == 1) {
+        // exp 1. Manually reverse the linking order.
+        createLinkedlistWithoutBarrier (head, isCrash);
+    } else if (func == 2) {
+        // exp 2. Do not reverse the linking order
+        createLinkedlistWithBarrier (head, isCrash);
+    } else if (func == 3) {
+        // exp 3. Insertion
+        insertLinkedlist (head, isCrash);
+    } else {
+        std::cout << "No such function \n" << std::endl;
+    }
 
     pmem_simulation.close ();
     // ============================================
